@@ -7,6 +7,24 @@ const SignIn: React.FC = () => {
   const { signInWithGoogle, loading } = useAuth();
   const navigate = useNavigate();
 
+  // Check if Firebase is properly configured
+  React.useEffect(() => {
+    const checkFirebaseConfig = () => {
+      const requiredVars = [
+        'VITE_FIREBASE_API_KEY',
+        'VITE_FIREBASE_AUTH_DOMAIN',
+        'VITE_FIREBASE_PROJECT_ID'
+      ];
+      
+      const missing = requiredVars.filter(varName => !import.meta.env[varName]);
+      if (missing.length > 0) {
+        console.error('Missing Firebase configuration:', missing);
+      }
+    };
+    
+    checkFirebaseConfig();
+  }, []);
+
   const handleSignIn = async () => {
     try {
       await signInWithGoogle();

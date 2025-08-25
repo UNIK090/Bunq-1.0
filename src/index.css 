@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gray-800 text-white dark:bg-gray-100 dark:text-gray-900;
+  }
+
+  .card {
+    @apply bg-gray-100 dark:bg-gray-800;
+  }
+
+  /* Add more component classes as needed */
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-thumb-gray-400 {
+    scrollbar-color: #a3a3a3 #e5e5e5;
+  }
+
+  .scrollbar-track-gray-200 {
+    scrollbar-color: #e5e5e5 #e5e5e5;
+  }
+
+  .dark .scrollbar-thumb-gray-600 {
+    scrollbar-color: #525252 #262626;
+  }
+
+  .dark .scrollbar-track-gray-800 {
+    scrollbar-color: #262626 #262626;
+  }
+}

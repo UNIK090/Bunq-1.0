@@ -1,0 +1,27 @@
+import React from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import SettingsDashboard from './components/Settings/SettingsDashboard';
+// Import other components as needed
+
+const routes = [
+  {
+    path: '/settings',
+    element: <SettingsDashboard />,
+  },
+  // Add other routes here
+];
+
+const router = createBrowserRouter(routes, {
+  future: {
+    v7_startTransition: true,
+    v7_relativeSplatPath: true,
+  },
+});
+
+function App() {
+  return (
+    <RouterProvider router={router} />
+  );
+}
+
+export default App;

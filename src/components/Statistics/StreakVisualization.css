@@ -1,0 +1,31 @@
+.streak-container {
+  margin: 20px 0;
+}
+
+.streak-grid {
+  display: flex;
+  justify-content: space-around;
+}
+
+.streak-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.streak-box {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  margin: 2px;
+}
+
+.active-box {
+  background-color: #40c463;
+  border: 1px solid #30a14e;
+}
+
+.inactive-box {
+  background-color: #ebedf0;
+  border: 1px solid #d1d5da;
+}

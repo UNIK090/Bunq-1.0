@@ -9,6 +9,11 @@ import {
   AppNotification,
   NotificationSettings,
   Annotation,
+  Group,
+  GroupMember,
+  GroupVideoSession,
+  GroupStatistics,
+  GroupMemberStats,
 } from "../types";
 import { 
   RealTimeProgress, 
@@ -34,6 +39,9 @@ interface AppState {
   realTimeProgress: Record<string, RealTimeProgress>;
   realTimeStatistics: RealTimeStatistics | null;
   realTimeLearningPath: RealTimeLearningPath | null;
+  groups: Group[];
+  currentGroup: Group | null;
+  groupStatistics: Record<string, GroupStatistics>;
   toggleDarkMode: () => void;
   setUserName: (name: string) => void;
   setIsSearching: (isSearching: boolean) => void;
@@ -63,6 +71,19 @@ interface AppState {
   setRealTimeProgress: (progress: Record<string, RealTimeProgress>) => void;
   setRealTimeStatistics: (stats: RealTimeStatistics) => void;
   setRealTimeLearningPath: (path: RealTimeLearningPath) => void;
+  createGroup: (name: string, description?: string, isPublic?: boolean, code?: string) => string;
+  joinGroup: (code: string) => void;
+  leaveGroup: (groupId: string) => void;
+  deleteGroup: (groupId: string) => void;
+  setCurrentGroup: (group: Group | null) => void;
+  updateGroup: (groupId: string, updates: Partial<Group>) => void;
+  addGroupMember: (groupId: string, member: GroupMember) => void;
+  removeGroupMember: (groupId: string, userId: string) => void;
+  startGroupVideoSession: (groupId: string, video: Video) => string;
+  updateGroupVideoSession: (sessionId: string, updates: Partial<GroupVideoSession>) => void;
+  endGroupVideoSession: (sessionId: string) => void;
+  updateGroupStatistics: (groupId: string, stats: Partial<GroupStatistics>) => void;
+  getGroupMemberStats: (groupId: string, userId: string) => GroupMemberStats | null;
 }
 
 export const useAppStore = create<AppState>()(
@@ -93,6 +114,9 @@ export const useAppStore = create<AppState>()(
       realTimeProgress: {},
       realTimeStatistics: null,
       realTimeLearningPath: null,
+      groups: [],
+      currentGroup: null,
+      groupStatistics: {},
 
       toggleDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
 
@@ -353,6 +377,203 @@ export const useAppStore = create<AppState>()(
       setRealTimeProgress: (progress) => set({ realTimeProgress: progress }),
       setRealTimeStatistics: (stats) => set({ realTimeStatistics: stats }),
       setRealTimeLearningPath: (path) => set({ realTimeLearningPath: path }),
+
+      // Group Management Methods
+      createGroup: (name, description = "", isPublic = true, code?: string) => {
+        const groupId = Date.now().toString();
+        const groupCode = code || Math.random().toString(36).substring(2, 8).toUpperCase();
+        const newGroup: Group = {
+          id: groupId,
+          name,
+          description,
+          code: groupCode,
+          ownerId: 'demo-user', // TODO: Replace with actual user ID
+          createdAt: new Date().toISOString(),
+          members: [],
+          videoSessions: [],
+          isPublic,
+        };
+        
+        set((state) => ({
+          groups: [...state.groups, newGroup],
+          currentGroup: newGroup,
+        }));
+        
+        return groupId;
+      },
+
+      joinGroup: async (code) => {
+        const state = get();
+        
+        // Validate code format (6 characters)
+        if (!code || code.length !== 6) {
+          console.error('Invalid group code format. Must be 6 characters.');
+          return;
+        }
+
+        // Check if group already exists in local state
+        const existingGroup = state.groups.find(g => g.code === code);
+        if (existingGroup) {
+          set({ currentGroup: existingGroup });
+          return;
+        }
+
+        // TODO: Check real-time database for group with this code
+        // For now, we'll simulate finding a group
+        try {
+          // This would be replaced with actual database lookup
+          const groupId = 'group-' + code; // Simulate group ID
+          const newGroup: Group = {
+            id: groupId,
+            name: `Group ${code}`,
+            description: 'Study group',
+            code: code,
+            ownerId: 'demo-owner',
+            createdAt: new Date().toISOString(),
+            members: [],
+            videoSessions: [],
+            isPublic: true,
+          };
+          
+          set((state) => ({
+            groups: [...state.groups, newGroup],
+            currentGroup: newGroup,
+          }));
+
+          // Send join notification to group
+          const joinMessage = {
+            type: 'system',
+            message: 'A new member has joined the group!',
+            userId: 'demo-user',
+            userName: 'Demo User',
+            timestamp: new Date().toISOString(),
+          };
+          
+          // Use the new sendMessageToGroup method
+          realtimeService.sendMessageToGroup(groupId, joinMessage)
+            .catch(console.error);
+
+        } catch (error) {
+          console.error('Error joining group:', error);
+        }
+      },
+
+      leaveGroup: (groupId) => {
+        set((state) => ({
+          groups: state.groups.filter(g => g.id !== groupId),
+          currentGroup: state.currentGroup?.id === groupId ? null : state.currentGroup,
+        }));
+      },
+
+      deleteGroup: (groupId) => {
+        set((state) => ({
+          groups: state.groups.filter(g => g.id !== groupId),
+          currentGroup: state.currentGroup?.id === groupId ? null : state.currentGroup,
+        }));
+        
+        // TODO: Also delete from real-time database
+        // realtimeService.deleteGroup(groupId).catch(console.error);
+      },
+
+      setCurrentGroup: (group) => set({ currentGroup: group }),
+
+      updateGroup: (groupId, updates) =>
+        set((state) => ({
+          groups: state.groups.map((group) =>
+            group.id === groupId ? { ...group, ...updates } : group,
+          ),
+          currentGroup: state.currentGroup?.id === groupId 
+            ? { ...state.currentGroup, ...updates } 
+            : state.currentGroup,
+        })),
+
+      addGroupMember: (groupId, member) =>
+        set((state) => ({
+          groups: state.groups.map((group) =>
+            group.id === groupId
+              ? {
+                  ...group,
+                  members: [...group.members.filter(m => m.userId !== member.userId), member],
+                }
+              : group,
+          ),
+        })),
+
+      removeGroupMember: (groupId, userId) =>
+        set((state) => ({
+          groups: state.groups.map((group) =>
+            group.id === groupId
+              ? {
+                  ...group,
+                  members: group.members.filter(m => m.userId !== userId),
+                }
+              : group,
+          ),
+        })),
+
+      startGroupVideoSession: (groupId, video) => {
+        const sessionId = Date.now().toString();
+        const newSession: GroupVideoSession = {
+          id: sessionId,
+          groupId,
+          videoId: video.id,
+          videoTitle: video.title,
+          startedAt: new Date().toISOString(),
+          participants: ['demo-user'], // TODO: Add current user
+          currentTimestamp: 0,
+          duration: 0,
+          isActive: true,
+        };
+
+        set((state) => ({
+          groups: state.groups.map((group) =>
+            group.id === groupId
+              ? {
+                  ...group,
+                  videoSessions: [...group.videoSessions, newSession],
+                }
+              : group,
+          ),
+        }));
+
+        return sessionId;
+      },
+
+      updateGroupVideoSession: (sessionId, updates) =>
+        set((state) => ({
+          groups: state.groups.map((group) => ({
+            ...group,
+            videoSessions: group.videoSessions.map((session) =>
+              session.id === sessionId ? { ...session, ...updates } : session,
+            ),
+          })),
+        })),
+
+      endGroupVideoSession: (sessionId) =>
+        set((state) => ({
+          groups: state.groups.map((group) => ({
+            ...group,
+            videoSessions: group.videoSessions.map((session) =>
+              session.id === sessionId
+                ? { ...session, isActive: false, endedAt: new Date().toISOString() }
+                : session,
+            ),
+          })),
+        })),
+
+      updateGroupStatistics: (groupId, stats) =>
+        set((state) => ({
+          groupStatistics: {
+            ...state.groupStatistics,
+            [groupId]: { ...(state.groupStatistics[groupId] || {}), ...stats },
+          },
+        })),
+
+      getGroupMemberStats: (groupId, userId) => {
+        const state = get();
+        const groupStats = state.groupStatistics[groupId];
+        return groupStats?.memberStats?.find(stats => stats.userId === userId) || null;
+      },
     }),
     {
       name: "youtube-learning-tracker-storage",

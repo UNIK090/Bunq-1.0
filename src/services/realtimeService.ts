@@ -11,8 +11,13 @@ import {
   RealTimeProgress, 
   RealTimeStatistics, 
   RealTimeLearningPath,
-  VideoWatchEvent 
+  VideoWatchEvent
 } from '../types/realtime';
+import {
+  Group,
+  GroupVideoSession,
+  GroupStatistics
+} from '../types';
 
 export class RealtimeService {
   private db = database;
@@ -184,6 +189,137 @@ export class RealtimeService {
         resolve(data || this.getDefaultStatistics(userId));
       }, { onlyOnce: true });
     });
+  }
+
+  // Group Real-time Updates
+  subscribeToGroup(groupId: string, callback: (group: Group) => void) {
+    const groupRef = ref(this.db, `groups/${groupId}`);
+    return onValue(groupRef, (snapshot) => {
+      const data = snapshot.val();
+      callback(data || this.getDefaultGroup(groupId));
+    });
+  }
+
+  subscribeToGroupVideoSessions(groupId: string, callback: (sessions: GroupVideoSession[]) => void) {
+    const sessionsRef = ref(this.db, `groups/${groupId}/videoSessions`);
+    return onValue(sessionsRef, (snapshot) => {
+      const data = snapshot.val();
+      const sessions: GroupVideoSession[] = data ? Object.values(data) : [];
+      callback(sessions);
+    });
+  }
+
+  subscribeToGroupStatistics(groupId: string, callback: (stats: GroupStatistics) => void) {
+    const statsRef = ref(this.db, `groups/${groupId}/statistics`);
+    return onValue(statsRef, (snapshot) => {
+      const data = snapshot.val();
+      callback(data || this.getDefaultGroupStatistics(groupId));
+    });
+  }
+
+  // Group Management
+  async createGroup(group: Group) {
+    const groupRef = ref(this.db, `groups/${group.id}`);
+    await set(groupRef, {
+      ...group,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+    return group.id;
+  }
+
+  async updateGroup(groupId: string, updates: Partial<Group>) {
+    const groupRef = ref(this.db, `groups/${groupId}`);
+    await update(groupRef, {
+      ...updates,
+      updatedAt: serverTimestamp(),
+    });
+  }
+
+  async addGroupMember(groupId: string, member: any) {
+    const memberRef = ref(this.db, `groups/${groupId}/members/${member.userId}`);
+    await set(memberRef, {
+      ...member,
+      joinedAt: serverTimestamp(),
+    });
+  }
+
+  async removeGroupMember(groupId: string, userId: string) {
+    const memberRef = ref(this.db, `groups/${groupId}/members/${userId}`);
+    await set(memberRef, null);
+  }
+
+  // Group Video Sessions
+  async startGroupVideoSession(session: GroupVideoSession) {
+    const sessionRef = ref(this.db, `groups/${session.groupId}/videoSessions/${session.id}`);
+    await set(sessionRef, {
+      ...session,
+      startedAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+    return session.id;
+  }
+
+  async updateGroupVideoSession(groupId: string, sessionId: string, updates: Partial<GroupVideoSession>) {
+    const sessionRef = ref(this.db, `groups/${groupId}/videoSessions/${sessionId}`);
+    await update(sessionRef, {
+      ...updates,
+      updatedAt: serverTimestamp(),
+    });
+  }
+
+  async endGroupVideoSession(groupId: string, sessionId: string) {
+    const sessionRef = ref(this.db, `groups/${groupId}/videoSessions/${sessionId}`);
+    await update(sessionRef, {
+      isActive: false,
+      endedAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+  }
+
+  // Group Messaging
+  async sendMessageToGroup(groupId: string, message: any) {
+    const messagesRef = ref(this.db, `groups/${groupId}/messages`);
+    const newMessageRef = push(messagesRef);
+    
+    await set(newMessageRef, {
+      ...message,
+      createdAt: serverTimestamp(),
+    });
+  }
+
+  // Group Statistics
+  async updateGroupStatistics(groupId: string, stats: Partial<GroupStatistics>) {
+    const statsRef = ref(this.db, `groups/${groupId}/statistics`);
+    await update(statsRef, {
+      ...stats,
+      updatedAt: serverTimestamp(),
+    });
+  }
+
+  // Default values
+  private getDefaultGroup(groupId: string): Group {
+    return {
+      id: groupId,
+      name: 'New Group',
+      code: '',
+      ownerId: '',
+      createdAt: new Date().toISOString(),
+      members: [],
+      videoSessions: [],
+      isPublic: true,
+    };
+  }
+
+  private getDefaultGroupStatistics(groupId: string): GroupStatistics {
+    return {
+      groupId,
+      totalWatchTime: 0,
+      totalVideosWatched: 0,
+      activeMembers: 0,
+      memberStats: [],
+      weeklyActivity: [],
+    };
   }
 }
 

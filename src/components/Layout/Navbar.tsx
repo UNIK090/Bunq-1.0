@@ -95,6 +95,13 @@ const Navbar: React.FC = () => {
             >
               Calendar
             </Link>
+            <Link
+              to="/groups"
+              className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              Group Study
+              
+            </Link>
             <NotificationBell />
 
             {/* User Profile Dropdown */}
@@ -228,6 +235,13 @@ const Navbar: React.FC = () => {
             onClick={() => setIsMobileMenuOpen(false)}
           >
             Calendar
+          </Link>
+          <Link
+            to="/groups"
+            className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Groups
           </Link>
 
           {/* Mobile User Info */}

@@ -102,3 +102,60 @@ export interface UserProfile {
     dailyGoal: number;
   };
 }
+
+export interface GroupMember {
+  userId: string;
+  displayName: string;
+  email: string;
+  photoURL?: string;
+  joinedAt: string;
+  role: "owner" | "member";
+}
+
+export interface GroupVideoSession {
+  id: string;
+  groupId: string;
+  videoId: string;
+  videoTitle: string;
+  startedAt: string;
+  endedAt?: string;
+  participants: string[];
+  currentTimestamp: number;
+  duration: number;
+  isActive: boolean;
+}
+
+export interface Group {
+  id: string;
+  name: string;
+  description?: string;
+  code: string;
+  ownerId: string;
+  createdAt: string;
+  members: GroupMember[];
+  videoSessions: GroupVideoSession[];
+  isPublic: boolean;
+}
+
+export interface GroupMemberStats {
+  userId: string;
+  displayName: string;
+  totalWatchTime: number;
+  videosWatched: number;
+  sessionsAttended: number;
+  lastActive: string;
+  progress: Record<string, VideoProgress>;
+}
+
+export interface GroupStatistics {
+  groupId: string;
+  totalWatchTime: number;
+  totalVideosWatched: number;
+  activeMembers: number;
+  memberStats: GroupMemberStats[];
+  weeklyActivity: {
+    date: string;
+    watchTime: number;
+    sessions: number;
+  }[];
+}

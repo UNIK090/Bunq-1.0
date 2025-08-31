@@ -8,6 +8,7 @@ import SearchDashboard from './components/Video/SearchDashboard';
 import VideoPlayer from './components/Video/VideoPlayer';
 import CalendarView from './components/Calendar/CalendarView';
 import LearningPath from './components/LearningPath/LearningPath';
+import GroupsPage from './components/Group/GroupsPage';
 import Statistics from './components/Statistics/Statistics';
 import SettingsDashboard from './components/Settings/SettingsDashboard';
 import SignIn from './components/Auth/SignIn';
@@ -15,6 +16,10 @@ import ProtectedRoute from './components/Auth/ProtectedRoute';
 import { useRealtimeData } from './hooks/useRealtimeData';
 import ErrorBoundary from './components/ErrorBoundary';
 import Chat from './components/Chat'; // Importing the Chat component
+import GroupCreation from './components/Group/GroupCreation';
+import JoinGroup from './components/Group/JoinGroup';
+import GroupList from './components/Group/GroupList';
+import GroupVideoPlayerWrapper from './components/Group/GroupVideoPlayerWrapper';
 import Loading from './components/Loading/Loading';
 
 const AuthenticatedRoutes = () => {
@@ -33,10 +38,14 @@ const AuthenticatedRoutes = () => {
         <Route path="/player" element={<VideoPlayer />} />
         <Route path="/calendar" element={<CalendarView />} />
         <Route path="/learning-path" element={<LearningPath />} />
+        <Route path="/groups" element={<GroupsPage />} />
         <Route path="/statistics" element={<Statistics />} />
         <Route path="/settings" element={<SettingsDashboard />} />
         <Route path="/search" element={<SearchDashboard />} />
         <Route path="/chat" element={<Chat />} /> {/* Adding Chat route */}
+        <Route path="/groups/create" element={<GroupCreation />} />
+        <Route path="/groups/join" element={<JoinGroup />} />
+        <Route path="/groups/watch/:groupId" element={<GroupVideoPlayerWrapper />} />
       </Routes>
     </Layout>
   );

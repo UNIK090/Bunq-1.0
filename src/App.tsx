@@ -21,6 +21,7 @@ import JoinGroup from './components/Group/JoinGroup';
 import GroupList from './components/Group/GroupList';
 import GroupVideoPlayerWrapper from './components/Group/GroupVideoPlayerWrapper';
 import Loading from './components/Loading/Loading';
+import VideoScheduleDashboard from './components/Dashboard/VideoScheduleDashboard';
 
 const AuthenticatedRoutes = () => {
   const { user } = useAuth();
@@ -46,6 +47,7 @@ const AuthenticatedRoutes = () => {
         <Route path="/groups/create" element={<GroupCreation />} />
         <Route path="/groups/join" element={<JoinGroup />} />
         <Route path="/groups/watch/:groupId" element={<GroupVideoPlayerWrapper />} />
+        <Route path="/video-schedule" element={<VideoScheduleDashboard />} />
       </Routes>
     </Layout>
   );

@@ -56,15 +56,15 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 lg:static lg:inset-auto lg:z-auto">
-      {/* Mobile backdrop */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Blurred backdrop */}
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 lg:hidden"
+        className="absolute inset-0 bg-black/30 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      {/* Notification panel */}
-      <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white dark:bg-gray-800 shadow-xl lg:relative lg:h-auto lg:max-h-96 lg:rounded-lg lg:border lg:border-gray-200 lg:dark:border-gray-700">
+      {/* Notification panel (centered) */}
+      <div className="relative w-full max-w-md bg-white dark:bg-gray-800 shadow-xl rounded-2xl border border-gray-200 dark:border-gray-700">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b dark:border-gray-700">
           <div className="flex items-center space-x-2">

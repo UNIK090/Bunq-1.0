@@ -159,3 +159,23 @@ export interface GroupStatistics {
     sessions: number;
   }[];
 }
+
+export interface DailySchedule {
+  day: number;
+  date: string;
+  watchTime: number;
+  startTime?: string;
+  endTime?: string;
+  completed: boolean;
+}
+
+export interface VideoSchedule {
+  id: string;
+  videoId: string;
+  video: Video;
+  targetDays: number;
+  totalDuration: number;
+  dailyWatchTime: number;
+  schedule: DailySchedule[];
+  createdAt: string;
+}

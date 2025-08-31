@@ -14,6 +14,8 @@ import {
   GroupVideoSession,
   GroupStatistics,
   GroupMemberStats,
+  VideoSchedule,
+  DailySchedule,
 } from "../types";
 import { 
   RealTimeProgress, 
@@ -42,6 +44,7 @@ interface AppState {
   groups: Group[];
   currentGroup: Group | null;
   groupStatistics: Record<string, GroupStatistics>;
+  videoSchedules: VideoSchedule[];
   toggleDarkMode: () => void;
   setUserName: (name: string) => void;
   setIsSearching: (isSearching: boolean) => void;
@@ -84,6 +87,11 @@ interface AppState {
   endGroupVideoSession: (sessionId: string) => void;
   updateGroupStatistics: (groupId: string, stats: Partial<GroupStatistics>) => void;
   getGroupMemberStats: (groupId: string, userId: string) => GroupMemberStats | null;
+  addVideoSchedule: (schedule: VideoSchedule) => void;
+  updateVideoSchedule: (scheduleId: string, updates: Partial<VideoSchedule>) => void;
+  removeVideoSchedule: (scheduleId: string) => void;
+  getVideoSchedule: (scheduleId: string) => VideoSchedule | null;
+  updateDailySchedule: (scheduleId: string, dayIndex: number, updates: Partial<DailySchedule>) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -117,6 +125,7 @@ export const useAppStore = create<AppState>()(
       groups: [],
       currentGroup: null,
       groupStatistics: {},
+      videoSchedules: [],
 
       toggleDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
 
@@ -574,6 +583,55 @@ export const useAppStore = create<AppState>()(
         const groupStats = state.groupStatistics[groupId];
         return groupStats?.memberStats?.find(stats => stats.userId === userId) || null;
       },
+
+      // Video Schedule Methods
+      addVideoSchedule: (schedule) =>
+        set((state) => ({
+          videoSchedules: [...state.videoSchedules, schedule],
+        })),
+
+      updateVideoSchedule: (scheduleId, updates) =>
+        set((state) => ({
+          videoSchedules: state.videoSchedules.map((schedule) =>
+            schedule.id === scheduleId ? { ...schedule, ...updates } : schedule,
+          ),
+        })),
+
+      removeVideoSchedule: (scheduleId) =>
+        set((state) => ({
+          videoSchedules: state.videoSchedules.filter(
+            (schedule) => schedule.id !== scheduleId,
+          ),
+        })),
+
+      getVideoSchedule: (scheduleId) => {
+        const state = get();
+        return state.videoSchedules.find(schedule => schedule.id === scheduleId) || null;
+      },
+
+      updateDailySchedule: (scheduleId, dayIndex, updates) =>
+        set((state) => {
+          const updatedSchedules = state.videoSchedules.map((schedule) => {
+            if (schedule.id === scheduleId) {
+              const updatedDailySchedules = [...schedule.schedule];
+              if (dayIndex >= 0 && dayIndex < updatedDailySchedules.length) {
+                updatedDailySchedules[dayIndex] = {
+                  ...updatedDailySchedules[dayIndex],
+                  ...updates,
+                };
+              }
+              return {
+                ...schedule,
+                schedule: updatedDailySchedules,
+              };
+            }
+            return schedule;
+          });
+
+          return {
+            videoSchedules: updatedSchedules,
+          };
+        }),
     }),
     {
       name: "youtube-learning-tracker-storage",

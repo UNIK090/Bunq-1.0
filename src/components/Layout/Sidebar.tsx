@@ -11,7 +11,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Search,
-  Users
+  Group
 } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 
@@ -25,10 +25,10 @@ const Sidebar: React.FC = () => {
     { to: "/player", icon: Play, label: "Video Player" },
     { to: "/calendar", icon: Calendar, label: "Calendar" },
     { to: "/learning-path", icon: BookOpen, label: "Learning Path" },
-    { to: "/groups", icon: Users, label: "Group Study" },
     { to: "/statistics", icon: BarChart, label: "Statistics" },
     { to: "/settings", icon: Settings, label: "Settings" },
     { to: "/search", icon: Search, label: "Search Videos" },
+    {to:"/groups",icon:Group,label:"Group Study"},
   ];
 
   return (

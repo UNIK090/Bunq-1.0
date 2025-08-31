@@ -31,11 +31,7 @@ const formatTime = (seconds: number): string => {
 
 const AdvancedVideoPlayer: React.FC = () => {
   const navigate = useNavigate();
-  const {
-    currentVideo,
-    videoProgress,
-    updateVideoProgress,
-  } = useAppStore();
+  const { currentVideo, videoProgress, updateVideoProgress } = useAppStore();
 
   const playerRef = useRef<HTMLDivElement>(null);
   const ytPlayerRef = useRef<any>(null);
@@ -54,7 +50,7 @@ const AdvancedVideoPlayer: React.FC = () => {
   // Track intervals watched
   const [watchedIntervals, setWatchedIntervals] = useState<[number, number][]>([]);
 
-  // Network State Listener
+  // Network state listener
   useEffect(() => {
     const handleOnline = () => {
       setIsOffline(false);
@@ -72,7 +68,7 @@ const AdvancedVideoPlayer: React.FC = () => {
     };
   }, []);
 
-  // YouTube Player Init
+  // YouTube player init
   useEffect(() => {
     if (!currentVideo || isOffline) return;
 
@@ -218,62 +214,91 @@ const AdvancedVideoPlayer: React.FC = () => {
     setCurrentTime(newTime);
   };
 
-  if (!currentVideo) return <div className="flex justify-center items-center h-full text-white">Loading video...</div>;
+  if (!currentVideo)
+    return <div className="flex justify-center items-center h-full text-white">Loading video...</div>;
 
   return (
-    <div className="h-full flex flex-col bg-gray-900 text-white relative">
+    <div className="h-full flex flex-col bg-black text-white">
       {isOffline && (
         <div className="bg-yellow-500 text-yellow-900 py-1 px-4 fixed top-0 left-0 right-0 z-50 flex items-center gap-2 font-semibold">
           <WifiOff className="w-5 h-5 animate-pulse" /> You are offline
         </div>
       )}
 
-      <header className="flex items-center p-4 bg-gradient-to-r from-purple-800 to-pink-800 gap-4">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-1 hover:text-indigo-300">
-          <ChevronLeft className="w-6 h-6" /> Back
+      {/* Header */}
+      <header className="flex items-center p-3 bg-gray-900 border-b border-gray-700">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-1 text-gray-200 hover:text-white"
+        >
+          <ChevronLeft className="w-5 h-5" /> Back
         </button>
-        <h1 className="text-xl font-extrabold truncate">{currentVideo.title}</h1>
+        <h1 className="ml-4 text-base font-medium text-gray-100 truncate">
+          {currentVideo.title}
+        </h1>
       </header>
 
-      <main className="flex-1 flex flex-col items-center justify-center p-2 space-y-2">
-        <div ref={playerRef} className="relative w-full max-w-5xl aspect-video bg-black rounded-lg overflow-hidden shadow-2xl">
+      {/* Main Video Player */}
+      <main className="flex-1 flex flex-col items-center justify-center bg-black">
+        <div ref={playerRef} className="relative w-full max-w-5xl aspect-video bg-black">
           {isLoading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 z-40">
-              <div className="animate-spin border-4 border-indigo-400 border-t-transparent rounded-full w-12 h-12"></div>
+            <div className="absolute inset-0 flex items-center justify-center bg-black/80">
+              <div className="animate-spin border-4 border-gray-300 border-t-transparent rounded-full w-10 h-10"></div>
             </div>
           )}
           {loadError && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-90 text-red-400 p-6">
-              <AlertTriangle className="w-16 h-16 animate-pulse mb-4" />
-              <p className="font-bold mb-4">{loadError}</p>
-              <button onClick={() => window.location.reload()} className="bg-indigo-600 px-5 py-2 rounded hover:bg-indigo-700">
-                <RefreshCw className="inline mr-2 w-5 h-5" /> Retry
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 text-red-400 p-6">
+              <AlertTriangle className="w-12 h-12 mb-3" />
+              <p className="font-medium">{loadError}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="mt-4 px-4 py-2 text-sm bg-gray-700 hover:bg-gray-600 rounded"
+              >
+                <RefreshCw className="inline mr-2 w-4 h-4" /> Retry
               </button>
             </div>
           )}
         </div>
 
         {/* Progress bar */}
-        <div className="relative w-full max-w-5xl h-3 bg-gray-700 rounded cursor-pointer" onClick={onSeek}>
+        <div className="relative w-full max-w-5xl h-2 bg-gray-700 cursor-pointer" onClick={onSeek}>
           {watchedIntervals.map(([start, end], i) => {
             const left = (start / duration) * 100;
             const width = ((end - start) / duration) * 100;
-            return <div key={i} className="absolute h-3 bg-green-500 opacity-60 rounded" style={{ left: `${left}%`, width: `${width}%` }} />;
+            return (
+              <div
+                key={i}
+                className="absolute h-2 bg-gray-500 opacity-50"
+                style={{ left: `${left}%`, width: `${width}%` }}
+              />
+            );
           })}
-          <div className="absolute h-3 bg-indigo-400 rounded" style={{ width: `${(currentTime / duration) * 100}%` }} />
+          <div className="absolute h-2 bg-white" style={{ width: `${(currentTime / duration) * 100}%` }} />
         </div>
 
         {/* Controls */}
-        <div className="w-full max-w-5xl flex items-center justify-between px-4 py-3 bg-gradient-to-r from-purple-800 to-pink-800 rounded-lg shadow-lg space-x-4">
-          <button onClick={togglePlayPause}>{isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8" />}</button>
-          <button onClick={toggleMute}>{isMuted ? <VolumeX className="w-6 h-6"/> : <Volume2 className="w-6 h-6" />}</button>
-          <input type="range" min={0} max={1} step={0.01} value={volume} onChange={onVolumeChange} className="w-28"/>
-          <button onClick={toggleFullscreen} className="ml-auto">{isFullscreen ? <Minimize2 className="w-6 h-6" /> : <Maximize2 className="w-6 h-6" />}</button>
-        </div>
-
-        <div className="w-full max-w-5xl flex justify-between px-4 text-xs text-gray-400 font-mono">
-          <span>{formatTime(currentTime)}</span>
-          <span>{formatTime(duration)}</span>
+        <div className="w-full max-w-5xl flex items-center gap-3 px-4 py-2 bg-black/70 text-white">
+          <button onClick={togglePlayPause}>
+            {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+          </button>
+          <button onClick={toggleMute}>
+            {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+          </button>
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={volume}
+            onChange={onVolumeChange}
+            className="w-28 accent-white"
+          />
+          <span className="ml-auto text-xs font-mono text-gray-400">
+            {formatTime(currentTime)} / {formatTime(duration)}
+          </span>
+          <button onClick={toggleFullscreen}>
+            {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+          </button>
         </div>
       </main>
     </div>

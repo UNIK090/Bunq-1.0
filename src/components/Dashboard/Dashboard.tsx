@@ -13,7 +13,6 @@ import RecentVideos from "./RecentVideos";
 import UpcomingReminders from "./UpcomingReminders";
 import SearchVideos from "../Video/SearchVideos";
 
-
 // Define the type for the StatsCard props
 interface StatsCardProps {
   title: string;
@@ -39,9 +38,9 @@ const Dashboard: React.FC = () => {
     userStats,
     isSearching,
     darkMode,
-    
     realTimeLearningPath,
   } = useAppStore();
+
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -49,7 +48,6 @@ const Dashboard: React.FC = () => {
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 1000);
-    // Cleanup the timer
     return () => clearTimeout(timer);
   }, []);
 
@@ -61,7 +59,9 @@ const Dashboard: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-full">Loading...</div>
+      <div className="flex justify-center items-center h-screen">
+        <div className="loader"></div>
+      </div>
     );
   }
 
@@ -124,8 +124,6 @@ const Dashboard: React.FC = () => {
           <UpcomingReminders />
         </div>
       </div>
-
-      
     </div>
   );
 };

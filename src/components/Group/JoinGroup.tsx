@@ -95,3 +95,44 @@ const JoinGroup: React.FC = () => {
 };
 
 export default JoinGroup;
+
+joinGroup: async (code) => {
+  const state = get();
+
+  // Validate code format (6 characters)
+  if (!code || code.length !== 6) {
+    console.error('Invalid group code format. Must be 6 characters.');
+    return;
+  }
+
+  // Check if group already exists in local state
+  const existingGroup = state.groups.find(g => g.code === code);
+  if (existingGroup) {
+    set({ currentGroup: existingGroup });
+    return;
+  }
+
+  try {
+    // Fetch group from database by code
+    const group = await realtimeService.getGroupByCode(code);
+    if (!group) {
+      throw new Error('Group not found');
+    }
+
+    // The group object contains the name set by the creator
+    set((state) => ({
+      groups: [...state.groups, group],
+      currentGroup: group,
+    }));
+
+    // Optionally: Add current user as a member in the database
+    await realtimeService.addGroupMember(group.id, state.currentUser);
+
+    // Optionally: Send join notification
+    // await realtimeService.sendMessageToGroup(group.id, joinMessage);
+
+  } catch (error) {
+    console.error('Error joining group:', error);
+    // Optionally: set error state for UI
+  }
+}

@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
+import { getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection } from "firebase/firestore";
 import { getDatabase } from "firebase/database";
 
 // Validate environment variables
@@ -59,5 +59,12 @@ export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({
   prompt: "select_account",
 });
+
+// Firestore Collections for Social Features
+export const userProfilesCollection = collection(db, 'userProfiles');
+export const socialInteractionsCollection = collection(db, 'socialInteractions');
+export const achievementsCollection = collection(db, 'achievements');
+export const leaderboardsCollection = collection(db, 'leaderboards');
+export const commentsCollection = collection(db, 'comments');
 
 export default app;

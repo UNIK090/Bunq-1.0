@@ -8,7 +8,6 @@ import SearchDashboard from './components/Video/SearchDashboard';
 import VideoPlayer from './components/Video/VideoPlayer';
 import CalendarView from './components/Calendar/CalendarView';
 import LearningPath from './components/LearningPath/LearningPath';
-import GroupsPage from './components/Group/GroupsPage';
 import Statistics from './components/Statistics/Statistics';
 import SettingsDashboard from './components/Settings/SettingsDashboard';
 import SignIn from './components/Auth/SignIn';
@@ -16,12 +15,17 @@ import ProtectedRoute from './components/Auth/ProtectedRoute';
 import { useRealtimeData } from './hooks/useRealtimeData';
 import ErrorBoundary from './components/ErrorBoundary';
 import Chat from './components/Chat'; // Importing the Chat component
-import GroupCreation from './components/Group/GroupCreation';
-import JoinGroup from './components/Group/JoinGroup';
-import GroupList from './components/Group/GroupList';
-import GroupVideoPlayerWrapper from './components/Group/GroupVideoPlayerWrapper';
 import Loading from './components/Loading/Loading';
 import VideoScheduleDashboard from './components/Dashboard/VideoScheduleDashboard';
+<<<<<<< HEAD
+=======
+import AIVideoScheduler from './components/Dashboard/AIVideoScheduler';
+import Leaderboard from './components/Social/Leaderboard';
+import UserProfile from './components/Social/UserProfile';
+import AchievementShowcase from './components/Social/AchievementShowcase';
+import FlashcardSystem from './components/Learning/FlashcardSystem';
+import AdminDashboard from './components/Admin/AdminDashboard';
+>>>>>>> 8ce3be7 (Bunq1.0)
 
 const AuthenticatedRoutes = () => {
   const { user } = useAuth();
@@ -29,6 +33,8 @@ const AuthenticatedRoutes = () => {
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
+
+  const isAdmin = (user as any).isAdmin ?? false;
 
   return (
     <Layout>
@@ -39,15 +45,33 @@ const AuthenticatedRoutes = () => {
         <Route path="/player" element={<VideoPlayer />} />
         <Route path="/calendar" element={<CalendarView />} />
         <Route path="/learning-path" element={<LearningPath />} />
-        <Route path="/groups" element={<GroupsPage />} />
         <Route path="/statistics" element={<Statistics />} />
         <Route path="/settings" element={<SettingsDashboard />} />
         <Route path="/search" element={<SearchDashboard />} />
         <Route path="/chat" element={<Chat />} /> {/* Adding Chat route */}
+<<<<<<< HEAD
         <Route path="/groups/create" element={<GroupCreation />} />
         <Route path="/groups/join" element={<JoinGroup />} />
         <Route path="/groups/watch/:groupId" element={<GroupVideoPlayerWrapper />} />
         <Route path="/video-schedule" element={<VideoScheduleDashboard />} />
+=======
+        <Route path="/video-schedule" element={<VideoScheduleDashboard />} />
+        <Route path="/ai-video-scheduler" element={<AIVideoScheduler />} />
+        <Route path="/leaderboard" element={<Leaderboard entries={[]} category="watchTime" title="Top Learners" />} />
+        <Route path="/social" element={<UserProfile profile={{
+          uid: 'demo',
+          email: 'demo@example.com',
+          displayName: 'Demo User',
+          photoURL: '',
+          createdAt: new Date().toISOString(),
+          lastLoginAt: new Date().toISOString(),
+          preferences: { theme: 'light', notifications: { enabled: true, remindersBefore: 15, dailyGoalReminders: true, completionNotifications: true }, dailyGoal: 60 },
+          socialStats: { followersCount: 0, followingCount: 0, totalWatchTime: 0, videosWatched: 0, playlistsCreated: 0, achievements: [] },
+          isPublic: true
+        }} />} />
+        <Route path="/flashcards" element={<FlashcardSystem flashcards={[]} onUpdateProgress={() => {}} />} />
+        <Route path="/admin" element={isAdmin ? <AdminDashboard /> : <Navigate to="/" replace />} />
+>>>>>>> 8ce3be7 (Bunq1.0)
       </Routes>
     </Layout>
   );

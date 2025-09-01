@@ -1,17 +1,24 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  ListVideo, 
-  Play, 
+import {
+  LayoutDashboard,
+  ListVideo,
+  Play,
   Calendar,
-  BookOpen, 
+  BookOpen,
   BarChart,
   Settings,
   ChevronLeft,
   ChevronRight,
   Search,
+<<<<<<< HEAD
   Group
+=======
+  Brain,
+  MessageSquare,
+  Trophy,
+  Users
+>>>>>>> 8ce3be7 (Bunq1.0)
 } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 
@@ -24,8 +31,12 @@ const Sidebar: React.FC = () => {
     { to: "/playlists", icon: ListVideo, label: "My Playlists" },
     { to: "/player", icon: Play, label: "Video Player" },
     { to: "/calendar", icon: Calendar, label: "Calendar" },
+    { to: "/ai-video-scheduler", icon: Brain, label: "AI Video Scheduler" },
     { to: "/learning-path", icon: BookOpen, label: "Learning Path" },
     { to: "/statistics", icon: BarChart, label: "Statistics" },
+    { to: "/chat", icon: MessageSquare, label: "Chat" },
+    { to: "/leaderboard", icon: Trophy, label: "Leaderboard" },
+    { to: "/social", icon: Users, label: "Social" },
     { to: "/settings", icon: Settings, label: "Settings" },
     { to: "/search", icon: Search, label: "Search Videos" },
     {to:"/groups",icon:Group,label:"Group Study"},

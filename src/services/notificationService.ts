@@ -1,4 +1,6 @@
 import { AppNotification } from "../types";
+import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import app from './firebase';
 
 class NotificationService {
   private static instance: NotificationService;
@@ -20,6 +22,20 @@ class NotificationService {
         await this.requestPermission();
       }
     }
+
+    // Handle incoming FCM messages
+    onMessage(this.messaging, (payload) => {
+      console.log('Message received. ', payload);
+      this.showNotification({
+        id: payload.messageId || Date.now().toString(),
+        type: 'social',
+        title: payload.notification?.title || 'Notification',
+        message: payload.notification?.body || '',
+        scheduledFor: new Date().toISOString(),
+        read: false,
+        createdAt: new Date().toISOString(),
+      });
+    });
   }
 
   public async requestPermission(): Promise<NotificationPermission> {
@@ -165,23 +181,75 @@ class NotificationService {
 
     this.showNotification(notification);
   }
+
+  // Firebase Cloud Messaging
+  private messaging = getMessaging(app);
+
+  public async requestFCMPermission(): Promise<string | null> {
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        const token = await getToken(this.messaging, { vapidKey: import.meta.env.VITE_FCM_VAPID_KEY });
+        return token;
+      }
+    } catch (error) {
+      console.error('Error getting FCM token:', error);
+    }
+    return null;
+  }
+
+  // Social Notifications
+  public showNewFollowerNotification(followerName: string): void {
+    const notification: AppNotification = {
+      id: Date.now().toString(),
+      type: "social",
+      title: "New Follower",
+      message: `${followerName} started following you!`,
+      scheduledFor: new Date().toISOString(),
+      read: false,
+      createdAt: new Date().toISOString(),
+    };
+    this.showNotification(notification);
+  }
+
+  public showLikeNotification(likerName: string, target: string): void {
+    const notification: AppNotification = {
+      id: Date.now().toString(),
+      type: "social",
+      title: "New Like",
+      message: `${likerName} liked your ${target}!`,
+      scheduledFor: new Date().toISOString(),
+      read: false,
+      createdAt: new Date().toISOString(),
+    };
+    this.showNotification(notification);
+  }
+
+  public showCommentNotification(commenterName: string, target: string): void {
+    const notification: AppNotification = {
+      id: Date.now().toString(),
+      type: "social",
+      title: "New Comment",
+      message: `${commenterName} commented on your ${target}!`,
+      scheduledFor: new Date().toISOString(),
+      read: false,
+      createdAt: new Date().toISOString(),
+    };
+    this.showNotification(notification);
+  }
+
+  public showAchievementNotification(achievementTitle: string): void {
+    const notification: AppNotification = {
+      id: Date.now().toString(),
+      type: "social",
+      title: "Achievement Unlocked",
+      message: `Congratulations! You unlocked "${achievementTitle}"!`,
+      scheduledFor: new Date().toISOString(),
+      read: false,
+      createdAt: new Date().toISOString(),
+    };
+    this.showNotification(notification);
+  }
 }
 
 export const notificationService = NotificationService.getInstance();
-
-export const scheduleReminderNotification = (reminder: Reminder) => {
-  const now = new Date();
-  const reminderTime = new Date(`${reminder.date}T${reminder.time}`);
-  const timeUntilReminder = reminderTime.getTime() - now.getTime();
-
-  if (timeUntilReminder > 0) {
-    setTimeout(() => {
-      if (Notification.permission === 'granted') {
-        new Notification('Learning Reminder', {
-          body: reminder.title,
-          icon: '/path/to/your/icon.png' // Add an appropriate icon
-        });
-      }
-    }, timeUntilReminder);
-  }
-};

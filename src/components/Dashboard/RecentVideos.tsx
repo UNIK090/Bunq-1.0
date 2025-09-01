@@ -7,6 +7,10 @@ const MiniPlayer: React.FC<{
   video: Video;
   onClose: () => void;
 }> = ({ video, onClose }) => {
+<<<<<<< HEAD
+=======
+  const { darkMode } = useAppStore();
+>>>>>>> 8ce3be7 (Bunq1.0)
   const [isPlaying, setIsPlaying] = useState(true);
   const [size, setSize] = useState({ width: 320, height: 180 }); // initial 16:9 ratio size
   const resizingRef = useRef<{
@@ -50,17 +54,28 @@ const MiniPlayer: React.FC<{
 
   return (
     <div
+<<<<<<< HEAD
       className="fixed bottom-4 right-4 bg-black bg-opacity-90 rounded-md shadow-lg text-white flex flex-col select-none z-50"
       style={{ width: size.width, height: size.height }}
     >
       <div className="flex items-center justify-between bg-gray-900 px-3 py-1 cursor-move">
+=======
+      className={`fixed bottom-4 right-4 bg-white bg-opacity-90 dark:bg-black dark:bg-opacity-90 rounded-md shadow-lg text-gray-900 dark:text-white flex flex-col select-none z-50`}
+      style={{ width: size.width, height: size.height }}
+    >
+      <div className="flex items-center justify-between bg-gray-100 dark:bg-gray-900 px-3 py-1 cursor-move">
+>>>>>>> 8ce3be7 (Bunq1.0)
         <span className="font-semibold truncate max-w-[calc(100%-40px)]">
           {video.title}
         </span>
         <button
           aria-label="Close mini player"
           onClick={onClose}
+<<<<<<< HEAD
           className="text-white hover:text-red-400"
+=======
+          className="text-gray-500 dark:text-white hover:text-red-400 dark:hover:text-red-400"
+>>>>>>> 8ce3be7 (Bunq1.0)
         >
           ✕
         </button>
@@ -76,7 +91,11 @@ const MiniPlayer: React.FC<{
       {/* Resize handle at bottom-right */}
       <div
         onMouseDown={onResizeMouseDown}
+<<<<<<< HEAD
         className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize bg-gray-600 opacity-75 hover:opacity-100 rounded-br-md"
+=======
+        className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize bg-gray-300 dark:bg-gray-600 opacity-75 hover:opacity-100 rounded-br-md"
+>>>>>>> 8ce3be7 (Bunq1.0)
       />
     </div>
   );
